@@ -1,6 +1,6 @@
 (ns zetawar.devcards.game-specs
   (:require
-   [clojure.spec :as s]
+   [cljs.spec.alpha :as s]
    [clojure.test.check.generators]
    [devcards.core :as dc :include-macros true]
    [zetawar.game.spec :as game.spec])

@@ -6,8 +6,17 @@
 /.nightlight.edn
 /.nrepl-*
 /.nyc_output
+/.clj-kondo
+/.idea
+/.lsp
+/.shadow-cljs
+/.vscode
+
 /TAGS
 /node_modules
 /out
 /tags
 /target
+
+
+zetawar.iml

@@ -1,6 +1,6 @@
 (ns zetawar.devcards.data-formats
   (:require
-   [clojure.spec :as s]
+   [cljs.spec.alpha :as s]
    [devcards.core :as dc :include-macros true]
    [integrant.core :as ig]
    [reagent.core :as r]

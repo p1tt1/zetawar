@@ -35,8 +35,8 @@
 #?(:clj
    (do
 
-     (defn slug-fn [filename]
-       (let [[year month day & parts] (string/split filename #"[-\.]")
+     (defn slug-fn [_ m]
+       (let [[year month day & parts] (string/split (:filename m) #"[-\.]")
              name-part (some->> parts
                                 drop-last
                                 not-empty
@@ -45,8 +45,8 @@
          (when (and year month day name-part)
            (str year "/" month "/" day "/" name-part))))
 
-     (defn permalink-fn [{:keys [slug path filename] :as data}]
-       (if (string/starts-with? path "posts")
+     (defn permalink-fn [global-meta {:keys [slug parent-path filename] :as m}]
+       (if (string/starts-with? parent-path "posts")
          (str +prefix+ "/blog/" slug "/")
          (str +prefix+ (string/replace filename #"\.markdown" "/"))))
 

@@ -2,7 +2,7 @@
   (:require
    [cljs.core.async :as async]
    [cljs.core.async.impl.protocols :as async.protocols]
-   [clojure.spec :as s]
+   [cljs.spec.alpha :as s]
    [clojure.spec.impl.gen :as gen]
    [clojure.test.check]
    [datascript.core :as d]))

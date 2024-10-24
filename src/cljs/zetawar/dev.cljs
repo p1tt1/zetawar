@@ -1,6 +1,6 @@
 (ns zetawar.dev
   (:require
-   [clojure.spec.test :as spec.test]
+   [cljs.spec.test.alpha :as spec.test]
    [devtools.core :as devtools]
    [zetawar.game-test]
    [zetawar.subs-test]
