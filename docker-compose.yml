@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  dev:
+    container_name: zetawar-dev
+    environment:
+      - ZETAWAR_DEV_HOST=0.0.0.0
+    volumes:
+      - .:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - 3000:3000
+    image: clojure-boot
+    command: ["boot", "dev"]
