@@ -1,11 +1,53 @@
-;; shadow-cljs configuration
-{:dependencies [[nubank/workspaces "1.0.3"]]
- :source-paths ["src/clj" "src/cljc" "src/cljs"]
- :builds {:workspaces {:target     nubank.workspaces.shadow-cljs.target
-                       :ns-regexp  "-(test|cards)$"
-                       :output-dir "assets/js/workspaces"
-                       :asset-path "/js/workspaces"
-                       :devtools   {:http-root          "assets"
-                                    :http-port          8080
-                                    :http-resource-root "."
-                                    :preloads           []}}}}
+{:deps {:aliases [:dev]}
+
+ :dev-http {3000 "assets"}
+
+ :npm-deps {"react" "16.3.0"
+            "react-dom" "16.3.0"
+            "react-bootstrap" "0.32.4"
+            "showdown" "1.9.1"
+            "clipboard" "1.5.9"
+            "raven-js" "3.9.1"}
+
+ :builds
+ {:main
+  {:target :browser
+   :output-dir "assets/js/main"
+   :asset-path "/js/main"
+   :modules {:main {:init-fn zetawar.core/init}}
+   :devtools {:preloads [zetawar.dev]
+              :after-load zetawar.core/reload}
+   :js-options {:resolve {"cljsjs.react" {:target :npm
+                                          :require "react"}
+                          "cljsjs.react.dom" {:target :npm
+                                              :require "react-dom"}
+                          "cljsjs.react-bootstrap" {:target :npm
+                                                    :require "react-bootstrap"}}}
+   :compiler-options {:parallel-build true
+                      :foreign-libs [{:file "src/js/lzw.js"
+                                      :provides ["lzw"]}]}}
+
+  :cli
+  {:target :node-script
+   :output-to "assets/js/cli.js"
+   :main zetawar.cli/main
+   :compiler-options {:optimizations :simple
+                      :foreign-libs [{:file "src/js/lzw.js"
+                                      :provides ["lzw"]}]}}
+
+  :workspaces
+  {:target nubank.workspaces.shadow-cljs.target
+   :ns-regexp "-(test|cards)$"
+   :output-dir "assets/js/workspaces"
+   :asset-path "/js/workspaces"
+   :devtools {:http-root "assets"
+              :http-port 8080
+              :http-resource-root "."}}
+
+  :test
+  {:target :browser-test
+   :test-dir "target/test"
+   :devtools {:http-port 8021}
+   :compiler-options {:externs ["js/externs.js"]
+                      :foreign-libs [{:file "src/js/lzw.js"
+                                      :provides ["lzw"]}]}}}}

@@ -1,18 +1,63 @@
-{:paths ["assets" "src/clj" "src/cljc" "src/cljs"]
+{:paths ["src/clj" "src/cljc" "src/cljs" "src/js" "src/scss" "assets"]
+
  :deps
- {com.cognitect/transit-cljs {:mvn/version "0.8.239"}
-  datascript {:mvn/version "0.15.5"}
-  integrant {:mvn/version "0.2.1"}
-  org.clojure/clojurescript {:mvn/version "1.10.439"}
-  org.clojure/core.async {:mvn/version "0.2.395"}
-  org.clojure/tools.cli {:mvn/version "0.4.1"}
-  posh {:mvn/version "0.5.5"}
-  reagent {:mvn/version "0.6.1"}}
+ {;; Core
+  org.clojure/clojure {:mvn/version "1.11.1"}
+  org.clojure/clojurescript {:mvn/version "1.11.60"}
+  org.clojure/core.async {:mvn/version "1.6.673"}
+  
+  ;; Frontend
+  reagent/reagent {:mvn/version "0.6.1"}
+  datascript/datascript {:mvn/version "1.7.3"}
+  posh/posh {:mvn/version "0.5.5"}
+  com.cognitect/transit-cljs {:mvn/version "0.8.239"}
+  integrant/integrant {:mvn/version "0.2.1"}
+  
+  ;; Other Dependencies
+  hiccup/hiccup {:mvn/version "1.0.5"}
+  tongue/tongue {:mvn/version "0.2.0"}
+  cheshire/cheshire {:mvn/version "5.13.0"}
+  
+  ;; Java Dependencies
+  javax.xml.bind/jaxb-api {:mvn/version "2.3.1"}
+  com.sun.xml.bind/jaxb-core {:mvn/version "2.3.0.1"}
+  com.sun.xml.bind/jaxb-impl {:mvn/version "2.3.0.1"}}
 
  :aliases
- {:build-dev {:extra-paths ["test/cljs"]
-              :extra-deps
-              {com.bhauman/figwheel-main {:mvn/version "0.1.9"}
-               com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-               devcards {:mvn/version "0.2.2"}}
-              :main-opts ["-m" "figwheel.main" "-b" "dev" "-r"]}}}
+ {:dev
+  {:extra-paths ["test/cljs"]
+   :extra-deps
+   {thheller/shadow-cljs {:mvn/version "2.25.2"}
+    binaryage/devtools {:mvn/version "0.9.1"}
+    devcards/devcards {:mvn/version "0.2.2"}
+    com.gfredericks/test.chuck {:mvn/version "0.2.7"}
+    org.clojure/test.check {:mvn/version "0.9.0"}
+    nubank/workspaces {:mvn/version "1.0.3"}
+    nrepl/nrepl {:mvn/version "1.0.0"}
+    refactor-nrepl/refactor-nrepl {:mvn/version "3.9.0"}
+    cider/cider-nrepl {:mvn/version "0.44.0"}}}
+
+  :test
+  {:extra-paths ["test"]
+   :extra-deps
+   {org.clojure/test.check {:mvn/version "0.9.0"}
+    com.gfredericks/test.chuck {:mvn/version "0.2.7"}}}
+
+  :build
+  {:deps
+   {io.github.clojure/tools.build {:git/tag "v0.9.6" :git/sha "8e78bcc"}
+    thheller/shadow-cljs {:mvn/version "2.25.2"}}
+   :ns-default build}
+
+  :css
+  {:extra-deps
+   {deraen/boot-sass {:mvn/version "0.6.0"}
+    danielsz/boot-autoprefixer {:mvn/version "0.0.9"}
+    org.webjars/bootstrap-sass {:mvn/version "3.3.7"}
+    org.webjars/font-awesome {:mvn/version "4.7.0"}}}
+
+  :site
+  {:extra-deps
+   {perun/perun {:mvn/version "0.5.0-SNAPSHOT"}
+    hiccup/hiccup {:mvn/version "1.0.5"}
+    org.martinklepsch/boot-gzip {:mvn/version "0.1.3"}}}}}
