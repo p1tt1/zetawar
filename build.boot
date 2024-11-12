@@ -175,8 +175,8 @@
                 :ws-host (or reload-host
                              (System/getenv "ZETAWAR_RELOAD_HOST")
                              (System/getenv "ZETAWAR_DEV_HOST"))
-                :ws-port (or reload-host
-                             (System/getenv "ZETAWAR_RELOAD_PORT")))
+                :ws-port (or reload-host 
+                             (Integer. (System/getenv "ZETAWAR_RELOAD_PORT"))))
         (cljs-repl-env :ws-host (or reload-host
                                     (System/getenv "ZETAWAR_CLJS_REPL_HOST")
                                     (System/getenv "ZETAWAR_DEV_HOST"))

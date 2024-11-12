@@ -4,10 +4,12 @@ services:
     container_name: zetawar-dev
     environment:
       - ZETAWAR_DEV_HOST=0.0.0.0
+      - ZETAWAR_RELOAD_PORT=36367
     volumes:
       - .:/usr/src/app
     working_dir: /usr/src/app
     ports:
       - 3000:3000
+      - 36367:36367
     image: clojure-boot
     command: ["boot", "dev"]
