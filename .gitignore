@@ -11,3 +11,10 @@
 /out
 /tags
 /target
+
+.clj-kondo/
+.idea/
+.lsp/
+.shadow-cljs/
+.vscode/
+zetawar.iml
