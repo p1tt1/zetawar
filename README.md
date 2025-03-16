@@ -4,6 +4,38 @@ Source code for [Zetawar](http://www.zetawar.com/). Zetawar is funded by the
 generous support of the [Zetawar
 Kickstarter](https://www.kickstarter.com/projects/djwhitt/zetawar) backers.
 
+## Development
+
+### Prerequisites
+
+- [Clojure CLI tools](https://clojure.org/guides/install_clojure)
+- [Node.js and npm](https://nodejs.org/)
+
+### Setup
+
+1. Clone the repository
+2. Run `./install-deps.sh` to install dependencies
+
+### Development Workflow
+
+- `make dev` - Start development server
+- `make test` - Run tests
+- `make clean` - Clean build artifacts
+
+### Building for Production
+
+- `make build-prod` - Build for production
+- `make deploy-prod` - Deploy to production
+
+### Project Structure
+
+- `src/clj` - Clojure source code
+- `src/cljc` - Shared Clojure/ClojureScript code
+- `src/cljs` - ClojureScript source code
+- `src/scss` - SCSS stylesheets
+- `content` - Cryogen site content
+- `assets` - Static assets
+
 ## Licenses
 
 Zetawar is Copyright 2016 Arugaba LLC licensed under the terms of the [MIT

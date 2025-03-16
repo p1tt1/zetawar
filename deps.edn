@@ -1,18 +1,42 @@
 {:paths ["assets" "src/clj" "src/cljc" "src/cljs"]
  :deps
- {com.cognitect/transit-cljs {:mvn/version "0.8.239"}
-  datascript {:mvn/version "0.15.5"}
-  integrant {:mvn/version "0.2.1"}
-  org.clojure/clojurescript {:mvn/version "1.10.439"}
-  org.clojure/core.async {:mvn/version "0.2.395"}
-  org.clojure/tools.cli {:mvn/version "0.4.1"}
-  posh {:mvn/version "0.5.5"}
-  reagent {:mvn/version "0.6.1"}}
+ {;; Core dependencies
+  com.cognitect/transit-cljs {:mvn/version "0.8.280"}
+  datascript/datascript {:mvn/version "1.5.3"}
+  integrant/integrant {:mvn/version "0.8.1"}
+  org.clojure/clojurescript {:mvn/version "1.11.60"}
+  org.clojure/core.async {:mvn/version "1.6.673"}
+  org.clojure/tools.cli {:mvn/version "1.0.219"}
+  posh/posh {:mvn/version "0.5.5"}
+  reagent/reagent {:mvn/version "1.2.0"}
+  
+  ;; Site generation
+  cryogen-core/cryogen-core {:mvn/version "0.4.1"}
+  hiccup/hiccup {:mvn/version "2.0.0-alpha2"}
+  
+  ;; Other dependencies
+  tongue/tongue {:mvn/version "0.4.4"}}
 
  :aliases
- {:build-dev {:extra-paths ["test/cljs"]
-              :extra-deps
-              {com.bhauman/figwheel-main {:mvn/version "0.1.9"}
-               com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
-               devcards {:mvn/version "0.2.2"}}
-              :main-opts ["-m" "figwheel.main" "-b" "dev" "-r"]}}}
+ {:dev
+  {:extra-paths ["test/cljs"]
+   :extra-deps
+   {thheller/shadow-cljs {:mvn/version "2.25.2"}
+    binaryage/devtools {:mvn/version "1.0.6"}
+    nubank/workspaces {:mvn/version "1.1.1"}}}
+  
+  :build
+  {:deps {io.github.clojure/tools.build {:mvn/version "0.9.4"}}
+   :ns-default build}
+  
+  :test
+  {:extra-paths ["test/cljs"]
+   :extra-deps
+   {org.clojure/test.check {:mvn/version "1.1.1"}
+    com.gfredericks/test.chuck {:mvn/version "0.2.13"}}}
+  
+  :run-tests
+  {:main-opts ["-m" "shadow.cljs.devtools.cli" "compile" "test"]}
+  
+  :serve
+  {:main-opts ["-m" "shadow.cljs.devtools.cli" "watch" "app"]}}}

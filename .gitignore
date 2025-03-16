@@ -11,10 +11,28 @@
 /out
 /tags
 /target
+/public
 
+# Shadow-cljs
+.shadow-cljs/
+/assets/js/main
+/assets/js/cli.js
+/assets/js/cli.js.map
+/assets/js/workspaces
+
+# CSS
+/assets/css/main.css
+/assets/css/main.css.map
+
+# Cryogen
+/resources/public
+
+# IDE
 .clj-kondo/
 .idea/
 .lsp/
-.shadow-cljs/
 .vscode/
 zetawar.iml
+
+# OS
+.DS_Store
