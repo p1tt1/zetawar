@@ -1,6 +1,6 @@
 # Zetawar Cleanup Plan
 
-**Date:** March 16, 2025  
+**Date:** March 16, 2025
 **Note:** This document is AI-generated.
 
 ## Overview
