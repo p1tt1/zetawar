@@ -2,7 +2,7 @@
   (:require
    [cljs.core.async :as async]
    [datascript.core :as d]
-   [zetawar-js-ai]
+   ["zetawar-js-lib" :refer [ZetawarAI]]
    [zetawar.app :as app]
    [zetawar.db :as db]
    [zetawar.game :as game]
@@ -12,22 +12,22 @@
    [zetawar.players.simple-embedded :refer [simple-embedded-player]]))
 
 (defn mk-actor-ctx [db game actor]
-  (js/ZetawarAI.makeActorContext db game actor))
+  (ZetawarAI.makeActorContext db game actor))
 
 (defn score-actor [db game actor actor-ctx]
-  (js/ZetawarAI.scoreActor db game actor actor-ctx))
+  (ZetawarAI.scoreActor db game actor actor-ctx))
 
 (defn mk-base-action-ctx [db game actor-ctx base]
-  (js/ZetawarAI.makeBaseActionContext db game actor-ctx base))
+  (ZetawarAI.makeBaseActionContext db game actor-ctx base))
 
 (defn score-base-action [db game base action-ctx action]
-  (js/ZetawarAI.scoreBaseAction db game base action-ctx (clj->js action)))
+  (ZetawarAI.scoreBaseAction db game base action-ctx (clj->js action)))
 
 (defn mk-unit-action-ctx [db game actor-ctx unit]
-  (js/ZetawarAI.makeUnitActionContext db game actor-ctx unit))
+  (ZetawarAI.makeUnitActionContext db game actor-ctx unit))
 
 (defn score-unit-action [db game unit action-ctx action]
-  (js/ZetawarAI.scoreUnitAction db game unit action-ctx (clj->js action)))
+  (ZetawarAI.scoreUnitAction db game unit action-ctx (clj->js action)))
 
 (defmethod players/new-player ::players/custom-js-ai
   [{:as app-ctx :keys [ev-chan notify-pub]} player-type faction-color]

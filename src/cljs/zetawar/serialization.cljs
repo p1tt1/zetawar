@@ -2,7 +2,7 @@
   (:require
    [cognitect.transit :as transit]
    [goog.crypt.base64 :as base64]
-   [lzw]
+   ["zetawar-js-lib" :refer [lzwEncode lzwDecode]]
    [zetawar.app :as app]
    [zetawar.data :as data]
    [zetawar.game :as game]
@@ -18,7 +18,7 @@
 (defn encode-game-state [game-state]
   (let [writer (transit/writer :json)]
     (-> (transit/write writer game-state)
-        js/lzwEncode
+        lzwEncode
         js/encodeURIComponent
         js/unescape
         (base64/encodeString true))))
@@ -29,7 +29,7 @@
                                (base64/decodeString true)
                                js/escape
                                js/decodeURIComponent
-                               js/lzwDecode)]
+                               lzwDecode)]
     (transit/read reader transit-game-state)))
 
 ;; TODO: move load-encoded-game-state! and set-url-game-state! back to app ns once
