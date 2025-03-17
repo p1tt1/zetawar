@@ -18,7 +18,11 @@
   tongue/tongue {:mvn/version "0.4.4"}}
 
  :aliases
- {:dev
+ {:antq
+  {:extra-deps {com.github.liquidz/antq {:mvn/version "2.11.1276"}}
+   :main-opts ["-m" "antq.core"]}
+  
+  :dev
   {:extra-paths ["test/cljs"]
    :extra-deps
    {thheller/shadow-cljs {:mvn/version "2.25.2"}

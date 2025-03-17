@@ -6,7 +6,6 @@
         [zetawar.site :as site])]
       :cljs
       [(:require
-        [cljsjs.react-bootstrap]
         [zetawar.site :as site])]))
 
 #?(:clj
@@ -72,20 +71,18 @@
                     [:li {:class "active"} [:a {:href href} title]]
                     [:li [:a {:href href} title]])))]]]]
       :cljs
-      [:> js/ReactBootstrap.Navbar {:fixed-top true :inverse true}
-       [:> js/ReactBootstrap.Navbar.Header
-        [:> js/ReactBootstrap.Navbar.Brand
-         [:a {:href "/"}
+      [:nav.navbar.navbar-inverse.navbar-fixed-top
+       [:div.container
+        [:div.navbar-header
+         [:a.navbar-brand {:href "/"}
           [:img {:src (site/prefix "/images/navbar-logo.svg")}]
           "Zetawar"]]
-        [:> js/ReactBootstrap.Navbar.Toggle]]
-       [:> js/ReactBootstrap.Navbar.Collapse
-        (into [:> js/ReactBootstrap.Nav]
-              (map-indexed (fn [idx {:keys [href title]}]
-                             (let [active (= title active-title)]
-                               [:> js/ReactBootstrap.NavItem {:event-key idx :active active :href href}
-                                title]))
-                           nav-links))]]
+        [:div#navbar-collapse.collapse.navbar-collapse
+         (into [:ul.nav.navbar-nav]
+               (for [{:keys [href title]} nav-links]
+                 (if (= title active-title)
+                   [:li.active [:a {:href href} title]]
+                   [:li [:a {:href href} title]])))]]]
       )
    ))
 
