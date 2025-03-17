@@ -1,7 +1,11 @@
-.PHONY: dev build-staging build-prod deploy-staging deploy-prod clean test
+.PHONY: dev dev-restart build-staging build-prod deploy-staging deploy-prod clean test
 
 dev:
 	npx shadow-cljs watch app
+
+dev-restart:
+	npx shadow-cljs stop
+	$(MAKE) dev
 
 build-staging:
 	clojure -T:build prod :env '"staging"'

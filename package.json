@@ -8,9 +8,9 @@
   "license": "MIT",
   "version": "0.1.0",
   "scripts": {
-    "css:build": "sass src/scss/main.scss:assets/css/main.css",
-    "css:watch": "sass --watch src/scss/main.scss:assets/css/main.css",
-    "css:build:prod": "sass src/scss/main.scss:assets/css/main.css --style compressed",
+    "css:build": "sass --load-path=node_modules src/scss/main.scss:assets/css/main.css",
+    "css:watch": "sass --load-path=node_modules --watch src/scss/main.scss:assets/css/main.css",
+    "css:build:prod": "sass --load-path=node_modules src/scss/main.scss:assets/css/main.css --style compressed",
     "css:autoprefixer": "postcss assets/css/main.css --use autoprefixer -o assets/css/main.css",
     "dev": "shadow-cljs watch app",
     "build": "shadow-cljs release app",
@@ -25,7 +25,9 @@
     "source-map-support": "^0.5.21"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "clipboard": "^2.0.11",
+    "font-awesome": "^4.7.0",
     "highlight.js": "^11.8.0",
     "raven-js": "^3.27.2",
     "react": "^17.0.2",

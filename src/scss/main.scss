@@ -1,5 +1,5 @@
-@import "bootstrap/bootstrap";
-@import "font-awesome/font-awesome";
+@import "bootstrap/scss/bootstrap";
+@import "font-awesome/scss/font-awesome";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global
@@ -22,11 +22,17 @@ body {
 }
 
 .noselect {
-    @include user-select(none);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .clickable {
-    @include user-select(none);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     cursor: pointer;
 }
 
