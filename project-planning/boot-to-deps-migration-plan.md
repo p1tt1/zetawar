@@ -329,6 +329,8 @@ Once the migration is complete, these Boot-related files can be removed:
 - boot.properties
 - Any Boot-specific configuration files
 
+For a detailed cleanup plan, see [cleanup-plan.md](cleanup-plan.md).
+
 ## Benefits of Migration
 
 1. **Modern Tooling**: Using the latest Clojure tooling ecosystem

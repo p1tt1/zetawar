@@ -1,2 +1,0 @@
-^{:connect-url "ws://penguin.linux.test:9500/figwheel-connect"}
-{:main zetawar.test-runner}
