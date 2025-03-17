@@ -17,44 +17,6 @@
    [zetawar.util :refer [breakpoint inspect only oonly]]
    [zetawar.views.common :refer [footer navbar]]))
 
-;; Custom Modal Components
-(defn modal [{:keys [show on-hide]} & children]
-  [:div.modal {:class (when show "show")
-               :style {:display (if show "block" "none")}
-               :on-click (fn [e]
-                           (when (= (.-target e) (.-currentTarget e))
-                             (on-hide)))}
-   [:div.modal-dialog
-    [:div.modal-content
-     children]]])
-
-(defn modal-header [{:keys [close-button]} & children]
-  [:div.modal-header
-   (when close-button
-     [:button.close {:type "button"
-                     :on-click (:on-hide close-button)}
-      "×"])
-   children])
-
-(defn modal-title [& children]
-  [:h4.modal-title children])
-
-(defn modal-body [& children]
-  [:div.modal-body children])
-
-(defn modal-footer [& children]
-  [:div.modal-footer children])
-
-;; Custom Table Components
-(defn table [{:keys [bordered striped condensed hover]} & children]
-  [:table.table
-   {:class (str
-            (when bordered " table-bordered")
-            (when striped " table-striped")
-            (when condensed " table-condensed")
-            (when hover " table-hover"))}
-   children])
-
 (defn tile-border [{:as view-ctx :keys [conn]} q r]
   (let [[x y] (tiles/offset->pixel q r)]
     [:g {:id (str "border-" q "," r)}
@@ -199,19 +161,39 @@
              :on-click #(.preventDefault %)}
          (translate :copy-game-url-link)])})))
 
+(defn modal [{:keys [show on-hide title body footer]}]
+  [:div.modal {:class (when show "show")
+               :style {:display (if show "block" "none")}
+               :on-click (fn [e]
+                           (when (= (.-target e) (.-currentTarget e))
+                             (on-hide)))}
+   [:div.modal-dialog
+    [:div.modal-content
+     (when title
+       [:div.modal-header
+        [:button.close {:type "button" :on-click on-hide} "×"]
+        [:h4.modal-title title]])
+     (when body
+       [:div.modal-body body])
+     (when footer
+       [:div.modal-footer footer])]]])
+
 (defn end-turn-alert [{:as view-ctx :keys [conn dispatch translate]}]
-  [modal {:show @(subs/show-end-turn-alert? conn)
-          :on-hide #(dispatch [::events.ui/hide-end-turn-alert])}
-   [modal-body
-    (translate :end-turn-alert)]
-   [modal-footer
-    [:button.btn.btn-default {:on-click (fn [e]
-                                          (.preventDefault e)
-                                          (dispatch [::events.ui/end-turn])
-                                          (dispatch [::events.ui/hide-end-turn-alert]))}
-     (translate :end-turn-confirm)]
-    [:button.btn.btn-default {:on-click #(dispatch [::events.ui/hide-end-turn-alert])}
-     (translate :cancel-button)]]])
+  [modal
+   {:show @(subs/show-end-turn-alert? conn)
+    :on-hide #(dispatch [::events.ui/hide-end-turn-alert])
+    :body (translate :end-turn-alert)
+    :footer (r/as-element
+             [:div
+              [:button.btn.btn-default
+               {:on-click (fn [e]
+                            (.preventDefault e)
+                            (dispatch [::events.ui/end-turn])
+                            (dispatch [::events.ui/hide-end-turn-alert]))}
+               (translate :end-turn-confirm)]
+              [:button.btn.btn-default
+               {:on-click #(dispatch [::events.ui/hide-end-turn-alert])}
+               (translate :cancel-button)]])}])
 
 (defn faction-status [{:as view-ctx :keys [conn dispatch translate]}]
   (let [{:keys [app/show-copy-link]} @(subs/app conn)
@@ -374,188 +356,183 @@
    :unit-type.armor-type/naval "N"
    :unit-type.armor-type/air "Ai"})
 
-;; TODO: cleanup unit-picker
+(defn unit-picker-row [unit-type color translate dispatch]
+  (let [color-or-grey (if (:affordable unit-type)
+                        color
+                        "unavailable")
+        image (->> (string/replace (:unit-type/image unit-type)
+                                   "COLOR" color-or-grey)
+                   (str "/images/game/"))
+        media-class (if (:affordable unit-type)
+                      "media text-left"
+                      "media text-left text-muted")
+        {:keys [unit-type/id
+                unit-type/description
+                unit-type/cost
+                unit-type/movement
+                unit-type/armor
+                unit-type/armor-type
+                unit-type/can-capture
+                unit-type/capturing-armor
+                unit-type/min-range
+                unit-type/max-range]} unit-type
+        armor-type-abbrev (armor-type-abbrevs armor-type)]
+    ^{:key (str "unit-row-" id)}
+    [:tr.text-center.clickable
+     {:on-click #(when (:affordable unit-type)
+                   (dispatch [::events.ui/hide-unit-picker])
+                   (dispatch [::events.ui/build-unit id]))}
+     [:td
+      [:div {:class media-class}
+       [:div.media-left.media-middle
+        [:img {:src image}]]
+       [:div.media-body
+        [:h4.media-heading description]
+        (str (translate :unit-cost-label) cost)]]]
+     [:td (case armor-type
+            :unit-type.armor-type/personnel
+            [:abbr {:title (translate :personnel-name)
+                    :style {:cursor "inherit"}}
+             armor-type-abbrev]
+
+            :unit-type.armor-type/armored
+            [:abbr {:title (translate :armored-name)
+                    :style {:cursor "inherit"}}
+             armor-type-abbrev]
+
+            :unit-type.armor-type/naval
+            [:abbr {:title (translate :naval-name)
+                    :style {:cursor "inherit"}}
+             armor-type-abbrev]
+
+            :unit-type.armor-type/air
+            [:abbr {:title (translate :air-name)
+                    :style {:cursor "inherit"}}
+             armor-type-abbrev])]
+     [:td movement]
+     [:td (if can-capture
+            [:abbr {:title (str (translate :while-capturing-label)
+                                capturing-armor)
+                    :style {:cursor "inherit"}}
+             armor]
+            [:abbr {:title (translate :unit-cannot-capture-bases-label)
+                    :style {:cursor "inherit"}}
+             armor])]
+     [:td (str min-range "-" max-range)]
+     [:td 
+      (for [unit-strength (:unit-type/strengths unit-type)]
+        (let [{:keys [unit-strength/armor-type
+                      unit-strength/attack]} unit-strength
+              armor-type-abbrev (armor-type-abbrevs armor-type)]
+          ^{:key (str "strength-" id "-" (name armor-type))}
+          [:div (str armor-type-abbrev ": " attack)]))]
+     [:td (string/join ", "
+                       (for [can-repair (:unit-type/can-repair unit-type)]
+                         (armor-type-abbrevs can-repair "")))]]))
+
 (defn unit-picker [{:as view-ctx :keys [conn dispatch translate]}]
   (let [unit-types @(subs/available-unit-types conn)
         cur-faction @(subs/current-faction conn)
         color (name (:faction/color cur-faction))
         hide-picker #(dispatch [::events.ui/hide-unit-picker])]
-    [modal {:show @(subs/picking-unit? conn)
-            :on-hide hide-picker}
-     [modal-header {:close-button {:on-hide hide-picker}}
-      [modal-title
-       (translate :build-title)]]
-     [modal-body
-      [table {:bordered true
-              :striped true
-              :condensed true
-              :hover true}
-       [:thead>tr
-        [:th ""]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :armor-type-label)]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :movement-label)]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :armor-label)]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :range-label)]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :attack-label)]
-        [:th.text-center {:style {:width "12%"}}
-         (translate :field-repair-label)]]
-       (into [:tbody]
-             (for [unit-type unit-types]
-               (let [;; TODO: replace with unit-type-image
-                     color-or-grey (if (:affordable unit-type)
-                                     color
-                                     "unavailable")
-                     image (->> (string/replace (:unit-type/image unit-type)
-                                                "COLOR" color-or-grey)
-                                (str "/images/game/"))
-                     media-class (if (:affordable unit-type)
-                                   "media text-left"
-                                   "media text-left text-muted")
-                     {:keys [unit-type/id
-                             unit-type/description
-                             unit-type/cost
-                             unit-type/movement
-                             unit-type/armor
-                             unit-type/armor-type
-                             unit-type/can-capture
-                             unit-type/capturing-armor
-                             unit-type/min-range
-                             unit-type/max-range]} unit-type
-                     armor-type-abbrev (armor-type-abbrevs armor-type)]
-                 [:tr.text-center.clickable
-                  {:on-click #(when (:affordable unit-type)
-                                (dispatch [::events.ui/hide-unit-picker])
-                                (dispatch [::events.ui/build-unit id]))}
-                  [:td>div {:class media-class}
-                   [:div.media-left.media-middle
-                    [:img {:src image}]]
-                   [:div.media-body
-                    [:h4.media-heading description]
-                    (str (translate :unit-cost-label) cost)]]
-                  [:td (case armor-type
-                         :unit-type.armor-type/personnel
-                         [:abbr {:title (translate :personnel-name)
-                                 :style {:cursor "inherit"}}
-                          armor-type-abbrev]
+    [modal
+     {:show @(subs/picking-unit? conn)
+      :on-hide hide-picker
+      :title (translate :build-title)
+      :body (r/as-element
+             [:div
+              [:table.table.table-bordered.table-striped.table-condensed.table-hover
+               [:thead
+                [:tr
+                 [:th ""]
+                 [:th.text-center {:style {:width "12%"}} (translate :armor-type-label)]
+                 [:th.text-center {:style {:width "12%"}} (translate :movement-label)]
+                 [:th.text-center {:style {:width "12%"}} (translate :armor-label)]
+                 [:th.text-center {:style {:width "12%"}} (translate :range-label)]
+                 [:th.text-center {:style {:width "12%"}} (translate :attack-label)]
+                 [:th.text-center {:style {:width "12%"}} (translate :field-repair-label)]]]
+               [:tbody
+                (for [unit-type unit-types]
+                  [unit-picker-row unit-type color translate dispatch])]]])
+      :footer (r/as-element
+               [:button.btn.btn-default {:on-click hide-picker}
+                (translate :cancel-button)])}]))
 
-                         :unit-type.armor-type/armored
-                         [:abbr {:title (translate :armored-name)
-                                 :style {:cursor "inherit"}}
-                          armor-type-abbrev]
-
-                         :unit-type.armor-type/naval
-                         [:abbr {:title (translate :naval-name)
-                                 :style {:cursor "inherit"}}
-                          armor-type-abbrev]
-
-                         :unit-type.armor-type/air
-                         [:abbr {:title (translate :air-name)
-                                 :style {:cursor "inherit"}}
-                          armor-type-abbrev])]
-                  [:td movement]
-                  [:td (if can-capture
-                         [:abbr {:title (str (translate :while-capturing-label)
-                                             capturing-armor)
-                                 :style {:cursor "inherit"}}
-                          armor]
-                         [:abbr {:title (translate :unit-cannot-capture-bases-label)
-                                 :style {:cursor "inherit"}}
-                          armor])]
-                  [:td min-range "-" max-range]
-                  (into [:td]
-                        (for [unit-strength (:unit-type/strengths unit-type)]
-                          (let [{:keys [unit-strength/armor-type
-                                        unit-strength/attack]} unit-strength
-                                armor-type-abbrev (armor-type-abbrevs armor-type)]
-                            [:div (str armor-type-abbrev ": " attack)])))
-                  [:td (string/join ", "
-                                    (for [can-repair (:unit-type/can-repair unit-type)]
-                                      (armor-type-abbrevs can-repair "")))]])))]]
-     [modal-footer
-      [:button.btn.btn-default {:on-click hide-picker}
-       (translate :cancel-button)]]]))
+(def faction-settings-state (r/atom {:selected-player-type nil}))
 
 (defn faction-settings [{:as views-ctx :keys [conn dispatch translate]}]
-  (with-let [faction (subs/faction-to-configure conn)
-             faction-color (subs/faction-color-name faction)
-             selected-player-type (r/atom nil)
-             hide-settings (fn [ev]
-                             (when ev (.preventDefault ev))
-                             (dispatch [::events.ui/hide-faction-settings]))
-             select-player-type #(reset! selected-player-type (.-target.value %))
-             set-player-type (fn [ev]
-                               (.preventDefault ev)
-                               (when-let [player-type-id (->> (or @selected-player-type :human)
-                                                              (keyword 'zetawar.players))]
-                                 (reset! selected-player-type nil)
-                                 (dispatch [::events.ui/set-faction-player-type @faction player-type-id]))
-                               (dispatch [::events.ui/hide-faction-settings]))]
-    [modal {:show (some? @faction)
-            :on-hide hide-settings}
-     [modal-header {:close-button {:on-hide hide-settings}}
-      [modal-title
-       (translate :configure-faction-title-prefix)
-       (translate @faction-color)]]
-     [modal-body
-      [:form
-       [:div.form-group
-        [:label {:for "player-type"}
-         (translate :player-type-label)]
-        (into [:select.form-control {:id "player-type"
-                                     :value (or @selected-player-type
-                                                (some-> @faction :faction/player-type name)
-                                                "")
-                                     :on-change select-player-type}]
-              (for [[player-type-id {:keys [description ai]}] players/player-types]
-                [:option {:value (name player-type-id)}
-                 description]))
-        [modal-footer
-         [:button.btn.btn-primary {:on-click set-player-type}
-          (translate :save-button)]
-         [:button.btn.btn-default {:on-click hide-settings}
-          (translate :cancel-button)]]]]]]))
+  (let [faction (subs/faction-to-configure conn)
+        faction-color (when faction (subs/faction-color-name faction))
+        hide-settings #(dispatch [::events.ui/hide-faction-settings])
+        select-player-type #(swap! faction-settings-state assoc :selected-player-type (.-target.value %))
+        set-player-type (fn [e]
+                          (.preventDefault e)
+                          (when-let [player-type-id (->> (or (:selected-player-type @faction-settings-state) :human)
+                                                         (keyword 'zetawar.players))]
+                            (swap! faction-settings-state assoc :selected-player-type nil)
+                            (when faction
+                              (dispatch [::events.ui/set-faction-player-type faction player-type-id])))
+                          (hide-settings))]
+    [modal
+     {:show (some? faction)
+      :on-hide hide-settings
+      :title (str (translate :configure-faction-title-prefix) " " (when faction-color (translate faction-color)))
+      :body (r/as-element
+             [:form {:on-submit set-player-type}
+              [:div.form-group
+               [:label {:for "player-type"}
+                (translate :player-type-label)]
+               (into [:select.form-control {:id "player-type"
+                                            :value (or (:selected-player-type @faction-settings-state)
+                                                       (some-> faction :faction/player-type name)
+                                                       "")
+                                            :on-change select-player-type}]
+                     (for [[player-type-id {:keys [description ai]}] players/player-types]
+                       [:option {:key (name player-type-id)
+                                 :value (name player-type-id)}
+                        description]))]])
+      :footer (r/as-element
+               [:div
+                [:button.btn.btn-primary {:type "button" :on-click set-player-type}
+                 (translate :save-button)]
+                [:button.btn.btn-default {:type "button" :on-click hide-settings}
+                 (translate :cancel-button)]])}]))
 
-;; TODO: move default-scenario-id to data ns?
+(def new-game-settings-state (r/atom {:selected-scenario-id :sterlings-aruba-multiplayer}))
+
 (defn new-game-settings [{:as view-ctx :keys [conn dispatch translate]}]
-  (with-let [default-scenario-id :sterlings-aruba-multiplayer
-             selected-scenario-id (r/atom default-scenario-id)
-             hide-settings (fn [ev]
-                             (when ev (.preventDefault ev))
-                             (dispatch [::events.ui/hide-new-game-settings]))
-             select-scenario #(reset! selected-scenario-id (keyword (.-target.value %)))
-             start-new-game #(do
-                               (.preventDefault %)
-                               (dispatch [::events.ui/start-new-game @selected-scenario-id])
-                               (reset! selected-scenario-id default-scenario-id)
-                               (dispatch [::events.ui/hide-new-game-settings]))]
-    [modal {:show @(subs/configuring-new-game? conn)
-            :on-hide hide-settings}
-     [modal-header {:close-button {:on-hide hide-settings}}
-      [modal-title
-       (translate :new-game-title)]]
-     [modal-body
-      [:form
-       [:div.form-group
-        [:label {:for "scenario-id"}
-         (translate :scenario-label)]
-        (into [:select.form-control {:id "scenario-id"
-                                     :selected (some-> @selected-scenario-id name)
-                                     :on-change select-scenario}]
-              (for [[scenario-id {:keys [description notes]}] data/scenarios]
-                [:option {:value (name scenario-id)}
-                 (if notes
-                   (str description ": " notes)
-                   description)]))
-        [modal-footer
-         [:button.btn.btn-primary {:on-click start-new-game}
-          (translate :start-button)]
-         [:button.btn.btn-default {:on-click hide-settings}
-          (translate :cancel-button)]]]]]]))
+  (let [default-scenario-id :sterlings-aruba-multiplayer
+        hide-settings #(dispatch [::events.ui/hide-new-game-settings])
+        select-scenario #(swap! new-game-settings-state assoc :selected-scenario-id (keyword (.-target.value %)))
+        start-new-game (fn [e]
+                         (.preventDefault e)
+                         (dispatch [::events.ui/start-new-game (:selected-scenario-id @new-game-settings-state)])
+                         (swap! new-game-settings-state assoc :selected-scenario-id default-scenario-id)
+                         (hide-settings))]
+    [modal
+     {:show @(subs/configuring-new-game? conn)
+      :on-hide hide-settings
+      :title (translate :new-game-title)
+      :body (r/as-element
+             [:form {:on-submit start-new-game}
+              [:div.form-group
+               [:label {:for "scenario-id"}
+                (translate :scenario-label)]
+               (into [:select.form-control {:id "scenario-id"
+                                            :value (name (:selected-scenario-id @new-game-settings-state))
+                                            :on-change select-scenario}]
+                     (for [[scenario-id {:keys [description notes]}] data/scenarios]
+                       [:option {:key (str "scenario-" (name scenario-id))
+                                 :value (name scenario-id)}
+                        (if notes
+                          (str description ": " notes)
+                          description)]))]])
+      :footer (r/as-element
+               [:div
+                [:button.btn.btn-primary {:type "button" :on-click start-new-game}
+                 (translate :start-button)]
+                [:button.btn.btn-default {:type "button" :on-click hide-settings}
+                 (translate :cancel-button)]])}]))
 
 (defn alert [{:as view-ctx :keys [conn dispatch]}]
   (let [{:keys [app/alert-message app/alert-type]} @(subs/app conn)
@@ -589,16 +566,15 @@
    [end-turn-alert view-ctx]
    ;; TODO: break win dialog out into it's own component
    ;; TODO: add continue + start new game buttons to win dialog
-   [modal {:show @(subs/show-win-message? conn)
-           :on-hide #(dispatch [::events.ui/hide-win-message])}
-    [modal-header {}
-     [modal-title
-      (translate :win-title)]]
-    [modal-body
-     {:dangerouslySetInnerHTML {:__html (translate :win-body)}}]
-    [modal-footer
-     [:button.btn.btn-default {:on-click #(dispatch [::events.ui/hide-win-message])}
-      (translate :close-button)]]]
+   [modal
+    {:show @(subs/show-win-message? conn)
+     :on-hide #(dispatch [::events.ui/hide-win-message])
+     :title (translate :win-title)
+     :body (r/as-element
+            [:div {:dangerouslySetInnerHTML {:__html (translate :win-body)}}])
+     :footer (r/as-element
+              [:button.btn.btn-default {:on-click #(dispatch [::events.ui/hide-win-message])}
+               (translate :close-button)])}]
    (navbar "Game")
    [:div.container
     [alert view-ctx]
