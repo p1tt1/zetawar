@@ -5,6 +5,7 @@
    [datascript.core :as d]
    [posh.reagent :as posh]
    [reagent.core :as r :refer [with-let]]
+   ["react-icons/fa" :refer [FaLaptop FaUser FaAngleDoubleLeft]]
    [zetawar.data :as data]
    [zetawar.db :refer [e qe]]
    [zetawar.events.ui :as events.ui]
@@ -137,9 +138,9 @@
   (let [{:keys [faction/credits]} @(subs/current-faction conn)
         {:keys [map/credits-per-base]} @(subs/game-map conn)
         income @(subs/current-income conn)]
-    [:p#faction-credits
-     [:strong (str credits " " (translate :credits-label))]
-     [:span.text-muted.pull-right
+    [:p#faction-credits.flex.justify-between.items-center.mb-4.font-medium
+     [:span.font-bold (str credits " " (translate :credits-label))]
+     [:span.text-gray-600
       (str "+" income)]]))
 
 (defn copy-url-link [{:as view-ctx :keys [conn translate]}]
@@ -162,21 +163,22 @@
          (translate :copy-game-url-link)])})))
 
 (defn modal [{:keys [show on-hide title body footer]}]
-  [:div.modal {:class (when show "show")
-               :style {:display (if show "block" "none")}
-               :on-click (fn [e]
-                           (when (= (.-target e) (.-currentTarget e))
-                             (on-hide)))}
-   [:div.modal-dialog
-    [:div.modal-content
-     (when title
-       [:div.modal-header
-        [:button.close {:type "button" :on-click on-hide} "×"]
-        [:h4.modal-title title]])
-     (when body
-       [:div.modal-body body])
-     (when footer
-       [:div.modal-footer footer])]]])
+  [:div.fixed.inset-0.z-50.overflow-auto.bg-black.bg-opacity-50
+   {:class (when show "block")
+    :style {:display (if show "flex" "none")}
+    :on-click (fn [e]
+                (when (= (.-target e) (.-currentTarget e))
+                  (on-hide)))}
+   [:div.relative.bg-white.rounded-lg.shadow-xl.m-auto.max-w-lg.w-full
+    (when title
+      [:div.px-6.py-4.border-b.border-gray-200
+       [:button.absolute.top-4.right-4.text-gray-500.hover:text-gray-700
+        {:type "button" :on-click on-hide} "×"]
+       [:h4.text-xl.font-medium title]])
+    (when body
+      [:div.px-6.py-4 body])
+    (when footer
+      [:div.px-6.py-4.border-t.border-gray-200.flex.justify-end.space-x-2 footer])]])
 
 (defn end-turn-alert [{:as view-ctx :keys [conn dispatch translate]}]
   [modal
@@ -184,14 +186,14 @@
     :on-hide #(dispatch [::events.ui/hide-end-turn-alert])
     :body (translate :end-turn-alert)
     :footer (r/as-element
-             [:div
-              [:button.btn.btn-default
+             [:div.flex.space-x-2
+              [:button.px-4.py-2.bg-blue-500.text-white.rounded.hover:bg-blue-600
                {:on-click (fn [e]
                             (.preventDefault e)
                             (dispatch [::events.ui/end-turn])
                             (dispatch [::events.ui/hide-end-turn-alert]))}
                (translate :end-turn-confirm)]
-              [:button.btn.btn-default
+              [:button.px-4.py-2.bg-gray-300.text-gray-800.rounded.hover:bg-gray-400
                {:on-click #(dispatch [::events.ui/hide-end-turn-alert])}
                (translate :cancel-button)]])}])
 
@@ -199,24 +201,28 @@
   (let [{:keys [app/show-copy-link]} @(subs/app conn)
         {:keys [game/round]} @(subs/game conn)
         base-count @(subs/current-base-count conn)]
-    [:div#faction-status
-     ;; TODO: make link red
-     [:a {:href "#" :on-click (fn [e]
-                                (.preventDefault e)
-                                (if @(subs/available-moves-left? conn)
-                                  (dispatch [::events.ui/show-end-turn-alert])
-                                  (dispatch [::events.ui/end-turn])))}
-      (translate :end-turn-link)]
-     (when show-copy-link
-       [:span " · " [copy-url-link view-ctx]])
-     [:div.pull-right
-      [:a {:href "#"
-           :on-click (fn [e]
-                       (.preventDefault e)
-                       (dispatch [::events.ui/show-new-game-settings]))}
+    [:div#faction-status.flex.justify-between.items-center.mb-4
+     [:div
+      ;; TODO: make link red
+      [:a.text-red-600.hover:text-red-800.font-medium 
+       {:href "#" 
+        :on-click (fn [e]
+                    (.preventDefault e)
+                    (if @(subs/available-moves-left? conn)
+                      (dispatch [::events.ui/show-end-turn-alert])
+                      (dispatch [::events.ui/end-turn])))}
+       (translate :end-turn-link)]
+      (when show-copy-link
+        [:span.mx-2 "·" [:span.mx-2 [copy-url-link view-ctx]]])]
+     [:div
+      [:a.text-blue-600.hover:text-blue-800.mr-2
+       {:href "#"
+        :on-click (fn [e]
+                    (.preventDefault e)
+                    (dispatch [::events.ui/show-new-game-settings]))}
        (translate :new-game-link)]
-      " · "
-      (str (translate :round-label) " " round)]]))
+      [:span.mx-2 "·"]
+      [:span.ml-2 (str (translate :round-label) " " round)]]]))
 
 (defn faction-actions [{:as view-ctx :keys [conn dispatch translate]}]
   ;; TODO: replace query with something from subs ns
@@ -231,32 +237,32 @@
     [:div#faction-actions
      (when @(subs/selected-can-move-to-targeted? conn)
        [:p
-        [:button.btn.btn-primary.btn-block
+        [:button.w-full.py-2.px-4.bg-blue-500.text-white.rounded.hover:bg-blue-600.focus:outline-none.focus:ring-2.focus:ring-blue-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/move-selected-unit])}
          (translate :move-unit-button)]])
      (when @(subs/selected-can-build? conn)
        [:p
-        [:button.btn.btn-primary.btn-block
+        [:button.w-full.py-2.px-4.bg-blue-500.text-white.rounded.hover:bg-blue-600.focus:outline-none.focus:ring-2.focus:ring-blue-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/show-unit-picker])}
          (translate :build-unit-button)]])
      (when @(subs/selected-can-attack-targeted? conn)
        [:p
-        [:button.btn.btn-danger.btn-block
+        [:button.w-full.py-2.px-4.bg-red-500.text-white.rounded.hover:bg-red-600.focus:outline-none.focus:ring-2.focus:ring-red-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/attack-targeted])}
          (translate :attack-unit-button)]])
      (when @(subs/selected-can-repair? conn)
        [:p
-        [:button.btn.btn-success.btn-block
+        [:button.w-full.py-2.px-4.bg-green-500.text-white.rounded.hover:bg-green-600.focus:outline-none.focus:ring-2.focus:ring-green-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/repair-selected])}
          (translate :repair-unit-button)]])
      (when @(subs/selected-can-repair-targeted? conn)
        [:p
-        [:button.btn.btn-success.btn-block
+        [:button.w-full.py-2.px-4.bg-green-500.text-white.rounded.hover:bg-green-600.focus:outline-none.focus:ring-2.focus:ring-green-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/repair-targeted])}
          (translate :field-repair-button)]])
      (when @(subs/selected-can-capture? conn)
        [:p
-        [:button.btn.btn-primary.btn-block
+        [:button.w-full.py-2.px-4.bg-blue-500.text-white.rounded.hover:bg-blue-600.focus:outline-none.focus:ring-2.focus:ring-blue-500.focus:ring-opacity-50
          {:on-click #(dispatch [::events.ui/capture-selected])}
          (translate :capture-base-button)]])
      ;; TODO: cleanup conditionals
@@ -285,7 +291,7 @@
         {:dangerouslySetInnerHTML {:__html (translate :multiplayer-tip)}}])]))
 
 (defn faction-list [{:as view-ctx :keys [conn dispatch translate]}]
-  (into [:ul.list-group]
+  (into [:ul.divide-y.divide-gray-200.border.border-gray-200.rounded]
         (for [faction @(subs/factions conn)]
           (let [faction-eid (e faction)
                 color (-> faction
@@ -294,61 +300,66 @@
                           string/capitalize)
                 active (= faction-eid @(subs/current-faction-eid conn))
                 li-class (if active
-                           "list-group-item active"
-                           "list-group-item")
-                icon-class (if (:faction/ai faction)
-                             "fa fa-fw fa-laptop clickable"
-                             "fa fa-fw fa-user clickable")]
+                           "bg-blue-100 text-blue-800 px-4 py-2 flex justify-between items-center"
+                           "bg-white hover:bg-gray-50 px-4 py-2 flex justify-between items-center")]
             [:li {:class li-class}
-             color
-             " "
-             (when active
-               [:span.fa.fa-angle-double-left
-                {:aria-hidden true}])
-             [:div.pull-right
-              [:span
-               {:class icon-class
-                :aria-hidden true
-                :on-click #(dispatch [::events.ui/configure-faction faction])
-                :title (translate :configure-faction-tip)}]]]))))
+             [:div.flex.items-center
+              [:span color]
+              " "
+              (when active
+                [:> FaAngleDoubleLeft {:className "ml-2" :aria-hidden true}])]
+             [:div
+              (if (:faction/ai faction)
+                [:> FaLaptop {:className "cursor-pointer"
+                              :aria-hidden true
+                              :onClick #(dispatch [::events.ui/configure-faction faction])
+                              :title (translate :configure-faction-tip)}]
+                [:> FaUser {:className "cursor-pointer"
+                            :aria-hidden true
+                            :onClick #(dispatch [::events.ui/configure-faction faction])
+                            :title (translate :configure-faction-tip)}])]]))))
 
 (defn status-info [{:as view-ctx :keys [conn translate]}]
-  [:div
+  [:div.mt-4.text-sm.text-gray-700
    (let [[sel-q sel-r] @(subs/selected-hex conn)
          [tar-q tar-r] @(subs/targeted-hex conn)
          [sel-mc sel-at sel-ar] @(subs/selected-terrain-effects conn)
          [tar-mc tar-at tar-ar] @(subs/targeted-terrain-effects conn)
          [hover-q hover-r] @(subs/hover-hex conn)]
-     [:span
-      (translate :selected-label)
-      (if sel-q
-        [:span
-         [:abbr {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
-          (str sel-q "," sel-r)]
-         (if sel-mc ;; If selected doesn't contain a unit
-           [:span
-            " ("
-            [:abbr {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
-             (str sel-mc "," sel-at "," sel-ar)]
-            ")"])]
-        [:span " -"])
-      " • "
-      (translate :targeted-label)
-      (if tar-q
-        [:span
-         [:abbr {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
-          (str tar-q "," tar-r)]
-         " ("
-         [:abbr {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
-          (str tar-mc "," tar-at "," tar-ar)]
-         ")"]
-        [:span " -"])
-      [:span.hidden-xs.hidden-sm
-       " • "
-       (translate :hover-tile-location)
-       (if hover-q
-         (str hover-q "," hover-r)
-         "-")]])])
+     [:div.flex.flex-wrap.items-center
+      [:div.mr-2
+       [:span.font-medium (translate :selected-label)]
+       (if sel-q
+         [:span
+          [:abbr.ml-1.font-mono {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
+           (str sel-q "," sel-r)]
+          (if sel-mc ;; If selected doesn't contain a unit
+            [:span
+             " ("
+             [:abbr.font-mono {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
+              (str sel-mc "," sel-at "," sel-ar)]
+             ")"])]
+         [:span.ml-1 "-"])]
+      [:div.mx-2 "•"]
+      [:div.mx-2
+       [:span.font-medium (translate :targeted-label)]
+       (if tar-q
+         [:span
+          [:abbr.ml-1.font-mono {:title (translate :tile-coordinates-label) :style {:cursor "inherit"}}
+           (str tar-q "," tar-r)]
+          " ("
+          [:abbr.font-mono {:title (translate :terrain-effects-label) :style {:cursor "inherit"}}
+           (str tar-mc "," tar-at "," tar-ar)]
+          ")"]
+         [:span.ml-1 "-"])]
+      [:div.hidden.md:block
+       [:div.mx-2 "•"]
+       [:div.mx-2
+        [:span.font-medium (translate :hover-tile-location)]
+        [:span.ml-1.font-mono
+         (if hover-q
+           (str hover-q "," hover-r)
+           "-")]]]])])
 
 (def armor-type-abbrevs
   {:unit-type.armor-type/personnel "P"
@@ -455,7 +466,8 @@
                 (for [unit-type unit-types]
                   [unit-picker-row unit-type color translate dispatch])]]])
       :footer (r/as-element
-               [:button.btn.btn-default {:on-click hide-picker}
+               [:button.px-4.py-2.bg-gray-300.text-gray-800.rounded.hover:bg-gray-400.focus:outline-none.focus:ring-2.focus:ring-gray-500.focus:ring-opacity-50
+                {:on-click hide-picker}
                 (translate :cancel-button)])}]))
 
 (def faction-settings-state (r/atom {:selected-player-type nil}))
@@ -479,23 +491,26 @@
       :title (str (translate :configure-faction-title-prefix) " " (when faction-color (translate faction-color)))
       :body (r/as-element
              [:form {:on-submit set-player-type}
-              [:div.form-group
-               [:label {:for "player-type"}
+              [:div.mb-4
+               [:label.block.text-gray-700.text-sm.font-bold.mb-2 {:for "player-type"}
                 (translate :player-type-label)]
-               (into [:select.form-control {:id "player-type"
-                                            :value (or (:selected-player-type @faction-settings-state)
-                                                       (some-> faction :faction/player-type name)
-                                                       "")
-                                            :on-change select-player-type}]
+               (into [:select.shadow.appearance-none.border.rounded.w-full.py-2.px-3.text-gray-700.leading-tight.focus:outline-none.focus:shadow-outline
+                      {:id "player-type"
+                       :value (or (:selected-player-type @faction-settings-state)
+                                  (some-> faction :faction/player-type name)
+                                  "")
+                       :on-change select-player-type}]
                      (for [[player-type-id {:keys [description ai]}] players/player-types]
                        [:option {:key (name player-type-id)
                                  :value (name player-type-id)}
                         description]))]])
       :footer (r/as-element
-               [:div
-                [:button.btn.btn-primary {:type "button" :on-click set-player-type}
+               [:div.flex.space-x-2
+                [:button.px-4.py-2.bg-blue-500.text-white.rounded.hover:bg-blue-600.focus:outline-none.focus:ring-2.focus:ring-blue-500.focus:ring-opacity-50
+                 {:type "button" :on-click set-player-type}
                  (translate :save-button)]
-                [:button.btn.btn-default {:type "button" :on-click hide-settings}
+                [:button.px-4.py-2.bg-gray-300.text-gray-800.rounded.hover:bg-gray-400.focus:outline-none.focus:ring-2.focus:ring-gray-500.focus:ring-opacity-50
+                 {:type "button" :on-click hide-settings}
                  (translate :cancel-button)]])}]))
 
 (def new-game-settings-state (r/atom {:selected-scenario-id :sterlings-aruba-multiplayer}))
@@ -515,12 +530,13 @@
       :title (translate :new-game-title)
       :body (r/as-element
              [:form {:on-submit start-new-game}
-              [:div.form-group
-               [:label {:for "scenario-id"}
+              [:div.mb-4
+               [:label.block.text-gray-700.text-sm.font-bold.mb-2 {:for "scenario-id"}
                 (translate :scenario-label)]
-               (into [:select.form-control {:id "scenario-id"
-                                            :value (name (:selected-scenario-id @new-game-settings-state))
-                                            :on-change select-scenario}]
+               (into [:select.shadow.appearance-none.border.rounded.w-full.py-2.px-3.text-gray-700.leading-tight.focus:outline-none.focus:shadow-outline
+                      {:id "scenario-id"
+                       :value (name (:selected-scenario-id @new-game-settings-state))
+                       :on-change select-scenario}]
                      (for [[scenario-id {:keys [description notes]}] data/scenarios]
                        [:option {:key (str "scenario-" (name scenario-id))
                                  :value (name scenario-id)}
@@ -528,32 +544,40 @@
                           (str description ": " notes)
                           description)]))]])
       :footer (r/as-element
-               [:div
-                [:button.btn.btn-primary {:type "button" :on-click start-new-game}
+               [:div.flex.space-x-2
+                [:button.px-4.py-2.bg-blue-500.text-white.rounded.hover:bg-blue-600.focus:outline-none.focus:ring-2.focus:ring-blue-500.focus:ring-opacity-50
+                 {:type "button" :on-click start-new-game}
                  (translate :start-button)]
-                [:button.btn.btn-default {:type "button" :on-click hide-settings}
+                [:button.px-4.py-2.bg-gray-300.text-gray-800.rounded.hover:bg-gray-400.focus:outline-none.focus:ring-2.focus:ring-gray-500.focus:ring-opacity-50
+                 {:type "button" :on-click hide-settings}
                  (translate :cancel-button)]])}]))
 
 (defn alert [{:as view-ctx :keys [conn dispatch]}]
   (let [{:keys [app/alert-message app/alert-type]} @(subs/app conn)
-        alert-class (str "alert alert-" (some-> alert-type name))]
+        alert-class (case (some-> alert-type name)
+                      "success" "bg-green-100 border-green-500 text-green-700"
+                      "info" "bg-blue-100 border-blue-500 text-blue-700"
+                      "warning" "bg-yellow-100 border-yellow-500 text-yellow-700"
+                      "danger" "bg-red-100 border-red-500 text-red-700"
+                      "bg-gray-100 border-gray-500 text-gray-700")]
     (when alert-message
-      [:div.row
-       [:div.col-md-12
-        [:div {:class alert-class}
-         [:button.close {:type :button
-                         :aria-label "Close"
-                         :on-click #(dispatch [::events.ui/hide-alert])}
+      [:div.w-full.mb-4
+       [:div.w-full
+        [:div.border-l-4.p-4.rounded {:class alert-class}
+         [:button.float-right.text-gray-500.hover:text-gray-700 
+          {:type :button
+           :aria-label "Close"
+           :on-click #(dispatch [::events.ui/hide-alert])}
           [:span {:aria-hidden true} "×"]]
          alert-message]]])))
 
 (defn game-interface [view-ctx]
-  [:div.row
-   [:div.col-md-2
+  [:div {:class "flex flex-wrap"}
+   [:div {:class "w-full md:w-1/6 lg:w-1/5 p-2"}
     [faction-credits view-ctx]
     [faction-list view-ctx]
     [faction-actions view-ctx]]
-   [:div.col-md-10
+   [:div {:class "w-full md:w-5/6 lg:w-4/5 p-2"}
     [faction-status view-ctx]
     [board view-ctx]
     [status-info view-ctx]]])
@@ -573,10 +597,11 @@
      :body (r/as-element
             [:div {:dangerouslySetInnerHTML {:__html (translate :win-body)}}])
      :footer (r/as-element
-              [:button.btn.btn-default {:on-click #(dispatch [::events.ui/hide-win-message])}
+              [:button.px-4.py-2.bg-gray-300.text-gray-800.rounded.hover:bg-gray-400.focus:outline-none.focus:ring-2.focus:ring-gray-500.focus:ring-opacity-50
+               {:on-click #(dispatch [::events.ui/hide-win-message])}
                (translate :close-button)])}]
    (navbar "Game")
-   [:div.container
+   [:div {:class "container mx-auto px-4"}
     [alert view-ctx]
     [game-interface view-ctx]]
    (footer)])
