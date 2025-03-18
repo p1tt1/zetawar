@@ -8,9 +8,9 @@
   "license": "MIT",
   "version": "0.1.0",
   "scripts": {
-    "css:build": "sass --load-path=node_modules src/scss/tailwind.scss:assets/css/tailwind.css && postcss assets/css/tailwind.css -o assets/css/main.css",
-    "css:watch": "sass --load-path=node_modules --watch src/scss/tailwind.scss:assets/css/tailwind.css & postcss assets/css/tailwind.css -o assets/css/main.css --watch",
-    "css:build:prod": "sass --load-path=node_modules src/scss/tailwind.scss:assets/css/tailwind.css --style compressed && postcss assets/css/tailwind.css -o assets/css/main.css",
+    "css:build": "sass --load-path=node_modules src/scss/tailwind.scss:assets/css/tailwind.css && npx tailwindcss -c tailwind.config.js -i assets/css/tailwind.css -o assets/css/main.css",
+    "css:watch": "sass --load-path=node_modules --watch src/scss/tailwind.scss:assets/css/tailwind.css & npx tailwindcss -c tailwind.config.js -i assets/css/tailwind.css -o assets/css/main.css --watch",
+    "css:build:prod": "sass --load-path=node_modules src/scss/tailwind.scss:assets/css/tailwind.css --style compressed && npx tailwindcss -c tailwind.config.js -i assets/css/tailwind.css -o assets/css/main.css --minify",
     "css:autoprefixer": "postcss assets/css/main.css --use autoprefixer -o assets/css/main.css",
     "dev": "npm run css:build && shadow-cljs watch app",
     "build": "npm run css:build:prod && shadow-cljs release app",
@@ -21,11 +21,11 @@
     "postcss": "^8.4.24",
     "postcss-cli": "^11.0.1",
     "postcss-import": "^16.1.0",
+    "postcss-nesting": "^13.0.1",
     "sass": "^1.63.6",
     "shadow-cljs": "^2.25.2",
     "source-map-support": "^0.5.21",
-    "tailwindcss": "^4.0.14",
-    "tailwindcss-cli": "^0.1.2"
+    "tailwindcss": "^3.3.3"
   },
   "dependencies": {
     "clipboard": "^2.0.11",

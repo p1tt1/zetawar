@@ -1,53 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 /* Base styles */
 @layer base {
   body {
     padding-top: 4rem; /* Add padding to account for fixed navbar (equivalent to h-16) */
   }
 }
-
 /* Custom components */
 @layer components {
   /* Game-specific styles that need to be preserved */
   .noselect {
     @apply select-none;
   }
-
   .clickable {
     @apply select-none cursor-pointer;
   }
-
   /* SVG rendering for game */
   svg {
-    image-rendering: -moz-crisp-edges;         /* Firefox */
-    image-rendering:   -o-crisp-edges;         /* Opera */
-    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: -o-crisp-edges; /* Opera */
+    image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
     image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    -ms-interpolation-mode: nearest-neighbor; /* IE (non-standard property) */
   }
-
   /* Game-specific components */
   #faction-status {
     @apply border-b border-gray-300 pb-1 mb-3;
   }
-
   /* Blog styles */
   .blog-post {
     @apply mb-16;
   }
-
   .blog-post-title {
     @apply mb-1 text-4xl;
   }
-
   .blog-post-meta {
     @apply mb-5 text-gray-500;
   }
-
   .blog-post-meta a {
     @apply text-gray-500;
   }
 }
+
+/*# sourceMappingURL=tailwind.css.map */

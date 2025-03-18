@@ -55,61 +55,58 @@
 (defn navbar
   ([] (navbar nil))
   ([active-title]
-   #?(
-      :clj
+   #?(:clj
       [:div#navbar-wrapper {:data-active-title active-title}
-       [:nav.navbar.navbar-inverse.navbar-fixed-top
-        [:div.container
-         [:div.navbar-header
-          [:a.navbar-brand {:href "/"}
-           [:img {:src (site/prefix "/images/navbar-logo.svg")}]
+       [:nav.fixed.top-0.left-0.right-0.z-50.bg-gray-800.text-white
+        [:div.container.mx-auto.px-4
+         [:div.flex.items-center.h-16
+          [:a.flex.items-center.text-xl.font-bold.mr-4 {:href "/"}
+           [:img.inline.mr-3 {:src (site/prefix "/images/navbar-logo.svg")}]
            "Zetawar"]]
-         [:div#navbar-collapse.collapse.navbar-collapse
-          (into [:ul.nav.navbar-nav ]
+         [:div
+          (into [:ul.flex.space-x-4]
                 (for [{:keys [href title]} nav-links]
                   (if (= title active-title)
-                    [:li {:class "active"} [:a {:href href} title]]
-                    [:li [:a {:href href} title]])))]]]]
+                    [:li.active [:a.text-white.font-medium {:href href} title]]
+                    [:li [:a.text-gray-300.hover:text-white {:href href} title]])))]]]]
       :cljs
-      [:nav.navbar.navbar-inverse.navbar-fixed-top
-       [:div.container
-        [:div.navbar-header
-         [:a.navbar-brand {:href "/"}
-          [:img {:src (site/prefix "/images/navbar-logo.svg")}]
-          "Zetawar"]]
-        [:div#navbar-collapse.collapse.navbar-collapse
-         (into [:ul.nav.navbar-nav]
-               (for [{:keys [href title]} nav-links]
-                 (if (= title active-title)
-                   [:li.active [:a {:href href} title]]
-                   [:li [:a {:href href} title]])))]]]
-      )
-   ))
+      [:nav.fixed.top-0.left-0.right-0.z-50.bg-gray-800.text-white
+       [:div.container.mx-auto.px-4
+        [:div.flex.items-center.justify-between.h-16
+         [:a.flex.items-center.text-xl.font-bold.mr-4 {:href "/"}
+          [:img.inline.mr-3 {:src (site/prefix "/images/navbar-logo.svg")}]
+          "Zetawar"]
+         [:div
+          (into [:ul.flex.space-x-4]
+                (for [{:keys [href title]} nav-links]
+                  (if (= title active-title)
+                    [:li.active [:a.text-white.font-medium {:href href} title]]
+                    [:li [:a.text-gray-300.hover:text-white.transition-colors {:href href} title]])))]]]])))
 
 (defn footer []
-  [:div.container
-   [:div#footer
+  [:div.container.mx-auto.px-4
+   [:div#footer.text-center.mt-5.py-2.border-t.border-gray-300.text-gray-600
     [:p
      "Build: "
      (if (not-empty site/build)
-       [:a {:href (str "/builds/" site/build)} site/build]
+       [:a.text-gray-600.hover:text-gray-800 {:href (str "/builds/" site/build)} site/build]
        "DEV")
      (when (not-empty site/build-timestamp)
        (str " • " site/build-timestamp))]
     [:p
      "Follow "
-     [:a {:href "https://twitter.com/ZetawarGame"} "@ZetawarGame"]
+     [:a.text-gray-600.hover:text-gray-800 {:href "https://twitter.com/ZetawarGame"} "@ZetawarGame"]
      " for updates. "
      "Questions or comments? Send us some "
-     [:a {:href "http://goo.gl/forms/RgTpkCYDBk"} "feedback"]
+     [:a.text-gray-600.hover:text-gray-800 {:href "http://goo.gl/forms/RgTpkCYDBk"} "feedback"]
      "."]
     [:p
      "Copyright 2016 Arugaba LLC under the "
-     [:a {:href "https://github.com/Zetawar/zetawar/blob/master/LICENSE.txt"}
+     [:a.text-gray-600.hover:text-gray-800 {:href "https://github.com/Zetawar/zetawar/blob/master/LICENSE.txt"}
       "MIT license"]]
     [:p
      "Artwork from "
-     [:a {:href "https://github.com/cvincent/elite-command"} "Elite Command"]
+     [:a.text-gray-600.hover:text-gray-800 {:href "https://github.com/cvincent/elite-command"} "Elite Command"]
      " Copyright 2015 Chris Vincent under "
-     [:a {:href "http://creativecommons.org/licenses/by/4.0/"}
+     [:a.text-gray-600.hover:text-gray-800 {:href "http://creativecommons.org/licenses/by/4.0/"}
       "Creative Commons Attribution 4.0 International License"]]]])
