@@ -10,16 +10,6 @@
 
 #?(:clj
    (do
-
-     (defn ga [tracking-id]
-       [:script
-        (str "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){"
-             "(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),"
-             "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)"
-             "})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');"
-             "ga('create', '" tracking-id "', 'auto');"
-             "ga('send', 'pageview');")])
-
      (defn sentry [sentry-url environment]
        [[:script {:src "https://cdn.ravenjs.com/3.9.1/raven.min.js"}]
         [:script (str "Raven.config('" sentry-url "', {"
@@ -37,12 +27,9 @@
               (include-css (site/prefix "/css/main.css"))
               (include-css (site/prefix "/css/highlight/default.css"))
               (include-js (site/prefix "/js/highlight.pack.js"))
-              [:script "hljs.initHighlightingOnLoad();"]
-              (some-> (:google-analytics-tracking-id global-meta)
-                      ga)]
+              [:script "hljs.initHighlightingOnLoad();"]]
              (some-> (:sentry-url global-meta)
                      (sentry (:sentry-environment global-meta)))))
-
      ))
 
 (def nav-links
