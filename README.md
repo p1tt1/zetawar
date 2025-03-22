@@ -19,12 +19,15 @@ Kickstarter](https://www.kickstarter.com/projects/djwhitt/zetawar) backers.
 ### Development Workflow
 
 - `make dev` - Start development server
+- `make dev-restart` - Restart development server
 - `make test` - Run tests
 - `make clean` - Clean build artifacts
 
 ### Building for Production
 
+- `make build-staging` - Build for staging
 - `make build-prod` - Build for production
+- `make deploy-staging` - Deploy to staging
 - `make deploy-prod` - Deploy to production
 
 ### Project Structure
@@ -35,6 +38,35 @@ Kickstarter](https://www.kickstarter.com/projects/djwhitt/zetawar) backers.
 - `src/scss` - SCSS stylesheets
 - `content` - Cryogen site content
 - `assets` - Static assets
+- `project-planning` - Migration and planning documents
+- `project-documentation` - Comprehensive technical documentation
+
+## Documentation
+
+### Project Planning
+
+The `project-planning` directory contains planning documents for various aspects of the project:
+
+- `boot-to-deps-migration-plan.md` - Plan for migrating from Boot to deps.edn
+- `cleanup-plan.md` - Plan for cleaning up the codebase
+- `styling-migration-plan.md` - Plan for migrating the styling system
+
+These documents outline the roadmap for modernizing the project's build system and codebase.
+
+### Technical Documentation
+
+The `project-documentation` directory contains comprehensive technical documentation about the project's architecture, implementation, and functionality:
+
+1. **Overview** - A high-level introduction to the project
+2. **Architecture and Paradigms** - Explanation of architectural patterns and programming paradigms
+3. **Data Model** - Description of the DataScript schema and game state structure
+4. **Game Mechanics** - Explanation of core game mechanics
+5. **UI Components** - Overview of UI components and rendering
+6. **AI System** - Details about the AI system and decision making
+7. **Dependencies** - Analysis of project dependencies
+8. **Conclusion** - Summary and guidance for further exploration
+
+Start with the [README](project-documentation/README.md) in the project-documentation directory for navigation links to all documentation files.
 
 ## Licenses
 
