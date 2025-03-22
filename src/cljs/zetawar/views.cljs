@@ -473,8 +473,13 @@
 (def faction-settings-state (r/atom {:selected-player-type nil}))
 
 (defn faction-settings [{:as views-ctx :keys [conn dispatch translate]}]
-  (let [faction (subs/faction-to-configure conn)
-        faction-color (when faction (subs/faction-color-name faction))
+  (let [faction @(subs/faction-to-configure conn)
+        faction-color (when faction 
+                        (-> faction
+                            :faction/color
+                            name
+                            (str "-name")
+                            keyword))
         hide-settings #(dispatch [::events.ui/hide-faction-settings])
         select-player-type #(swap! faction-settings-state assoc :selected-player-type (.-target.value %))
         set-player-type (fn [e]

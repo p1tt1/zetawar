@@ -581,10 +581,10 @@
 ;;; Faction configuration
 
 (deftrack faction-to-configure [conn]
-  (some->> @(app conn)
-           :app/configuring-faction
-           e
-           (get @(factions-by-eid conn))))
+  (let [app-data @(app conn)
+        configuring-faction (:app/configuring-faction app-data)]
+    (when configuring-faction
+      (get @(factions-by-eid conn) (e configuring-faction)))))
 
 (deftrack configuring-faction? [conn]
   (some? @(faction-to-configure conn)))

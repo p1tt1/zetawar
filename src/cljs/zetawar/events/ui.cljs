@@ -316,8 +316,9 @@
 (defmethod router/handle-event ::hide-faction-settings
   [{:as handler-ctx :keys [ev-chan db]} _]
   (let [app (app/root db)
-        faction-eid (-> app :app/configuring-faction e)]
-    {:tx [[:db/retract (e app) :app/configuring-faction faction-eid]]}))
+        configuring-faction (:app/configuring-faction app)]
+    (when configuring-faction
+      {:tx [[:db/retract (e app) :app/configuring-faction (e configuring-faction)]]})))
 
 ;; TODO: find a way to make player swapping nicer (maybe put in router?)
 ;; TODO: cleanup return value construction
@@ -325,12 +326,24 @@
   [{:as handler-ctx :keys [ev-chan conn db players]} [_ faction player-type-id]]
   (let [{:as app :keys [ai-turn-stepping]} (app/root db)
         {:keys [game/factions game/current-faction]} (app/current-game db)
-        {:keys [faction/color]} faction
-        other-factions (remove #(= (e faction) (e %)) factions)
-        {:keys [ai]} (players/player-types-by-id player-type-id)
-        tx [{:db/id (e faction)
-             :faction/ai ai
-             :faction/player-type player-type-id}]
+        ;; Get the actual faction entity from the app if it's not already an entity
+        faction (cond
+                  ;; If faction is nil or not a valid entity, get it from app
+                  (or (nil? faction)
+                      (not (or (number? faction) 
+                               (and (map? faction) (:db/id faction)))))
+                  (:app/configuring-faction app)
+                  
+                  ;; Otherwise use the provided faction
+                  :else faction)]
+    ;; Only proceed if we have a valid faction
+    (when faction
+      (let [{:keys [faction/color]} faction
+            other-factions (remove #(= (e faction) (e %)) factions)
+            {:keys [ai]} (players/player-types-by-id player-type-id)
+            tx [{:db/id (e faction)
+                 :faction/ai ai
+                 :faction/player-type player-type-id}]
         cur-player (color @players)
         new-player (players/new-player handler-ctx player-type-id color)
         notify (when (and ai (= (e faction) (e current-faction)))
@@ -344,7 +357,7 @@
        :dispatch [[::alert "AI enabled for all factions. Enabling turn stepping."]]
        :notify notify}
       {:tx (conj tx [:db/add (e app) :app/ai-turn-stepping false])
-       :notify notify})))
+       :notify notify})))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; New game

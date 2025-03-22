@@ -1,6 +1,7 @@
 (ns zetawar.db
   (:require
    [datascript.core :as d]
+   [datascript.impl.entity]
    [zetawar.logging :as log]
    [zetawar.util :refer [breakpoint inspect solo ssolo]]))
 
