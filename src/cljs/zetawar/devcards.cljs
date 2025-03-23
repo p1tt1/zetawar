@@ -7,5 +7,5 @@
    [zetawar.devcards.selection-and-target]
    [zetawar.site :as site]))
 
-(when (site/viewing-devcards?)
+(defn ^:export init []
   (devcards/start-devcard-ui!))

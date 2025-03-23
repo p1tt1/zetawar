@@ -13,6 +13,7 @@
     "css:build:prod": "sass --load-path=node_modules src/scss/tailwind.scss:assets/css/tailwind.css --style compressed && npx tailwindcss -c tailwind.config.js -i assets/css/tailwind.css -o assets/css/main.css --minify",
     "css:autoprefixer": "postcss assets/css/main.css --use autoprefixer -o assets/css/main.css",
     "dev": "npm run css:build && shadow-cljs watch app",
+    "devcards": "npm run css:build && shadow-cljs watch devcards",
     "build": "npm run css:build:prod && shadow-cljs release app",
     "test": "shadow-cljs compile test"
   },
@@ -29,7 +30,9 @@
   },
   "dependencies": {
     "clipboard": "^2.0.11",
+    "create-react-class": "15.6.3",
     "highlight.js": "^11.8.0",
+    "marked": "^0.7.0",
     "raven-js": "^3.27.2",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",

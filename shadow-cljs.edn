@@ -9,6 +9,15 @@
    :modules {:main {:init-fn zetawar.core/init}}
    :devtools {:after-load zetawar.core/reload}}
   
+  :devcards
+  {:target :browser
+   :output-dir "assets/js/devcards"
+   :asset-path "/js/devcards"
+   :modules {:main {:init-fn zetawar.devcards/init}}
+   :compiler-options {:devcards true}
+   :devtools {:http-port 8083
+              :http-root "assets"}}
+  
   :cli
   {:target :node-script
    :output-to "assets/js/cli.js"

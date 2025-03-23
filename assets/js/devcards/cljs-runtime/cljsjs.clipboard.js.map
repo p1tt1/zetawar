@@ -1,0 +1,1 @@
+{"version":3,"sources":["cljsjs/clipboard.cljs"],"mappings":"","names":[],"sourcesContent":["(ns cljsjs.clipboard\n  (:require [\"zetawar-js-lib\" :refer [Clipboard]]))\n"]}

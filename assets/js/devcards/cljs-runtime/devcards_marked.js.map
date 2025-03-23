@@ -1,0 +1,1 @@
+{"version":3,"sources":["devcards_marked.cljs"],"mappings":";AAGA,AAAKA,yBAAOC","names":["devcards-marked/marked","js/marked"],"sourcesContent":["(ns devcards-marked\n  (:require [cljsjs.marked]))\n\n(def marked js/marked)\n"]}

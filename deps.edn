@@ -27,7 +27,8 @@
    :extra-deps
    {thheller/shadow-cljs {:mvn/version "2.25.2"}
     binaryage/devtools {:mvn/version "1.0.6"}
-    nubank/workspaces {:mvn/version "1.1.1"}}}
+    nubank/workspaces {:mvn/version "1.1.1"}
+    devcards/devcards {:mvn/version "0.2.7"}}}
   
   :build
   {:deps {io.github.clojure/tools.build {:mvn/version "0.9.4"}}
