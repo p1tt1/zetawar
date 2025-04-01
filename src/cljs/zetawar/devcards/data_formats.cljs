@@ -39,8 +39,8 @@
     :max-count-per-unit 10
     :credits-per-base 100
     :bases
-    [{:q 0 :r 0}
-     {:q 2 :r 0}]
+    [{:q 0 :r 0 :base-type :base}
+     {:q 2 :r 0 :base-type :base}]
     :factions
     [{:color :blue
       :credits 100

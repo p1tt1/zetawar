@@ -12,7 +12,12 @@
    [zetawar.system.game]
    [zetawar.system.players]
    [zetawar.system.reagent]
-   [zetawar.system.router]))
+   [zetawar.system.router]
+   ;; Player implementation namespaces - required for player multimethods
+   [zetawar.players.human]
+   [zetawar.players.ai.reference]
+   [zetawar.players.ai.custom]
+   [zetawar.players.ai.custom-js]))
 
 (defn ^:export init []
   (devcards/start-devcard-ui!))
