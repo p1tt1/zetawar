@@ -35,7 +35,7 @@
     (let [db @conn
           game (app/current-game db)
           unit (game/unit-at db game 2 2)
-          done-state (game/unit-state-by-id db game :unit-state.id/move-attack_moved)]
+          done-state (game/unit-state-by-id db game :unit-state.id/move-attack-once_moved)]
       (d/transact! conn [{:db/id (-> db app/root e)
                           :app/selected-q 2
                           :app/selected-r 2}
@@ -53,7 +53,7 @@
     (let [db @conn
           game (app/current-game db)
           unit (game/unit-at db game 2 2)
-          done-state (game/unit-state-by-id db game :unit-state.id/move-attack_moved)]
+          done-state (game/unit-state-by-id db game :unit-state.id/move-attack-once_moved)]
       (d/transact! conn (into (game/teleport-tx db game 2 2 6 8)
                               [{:db/id (-> db app/root e)
                                 :app/selected-q 6
