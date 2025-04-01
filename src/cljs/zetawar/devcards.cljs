@@ -5,7 +5,14 @@
    [zetawar.devcards.game-specs]
    [zetawar.devcards.maps-and-scenarios]
    [zetawar.devcards.selection-and-target]
-   [zetawar.site :as site]))
+   [zetawar.site :as site]
+   ;; System component namespaces - required for Integrant multimethods
+   [zetawar.system.datascript]
+   [zetawar.system.game-views]
+   [zetawar.system.game]
+   [zetawar.system.players]
+   [zetawar.system.reagent]
+   [zetawar.system.router]))
 
 (defn ^:export init []
   (devcards/start-devcard-ui!))
