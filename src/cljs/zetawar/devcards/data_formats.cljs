@@ -65,37 +65,37 @@
 
 (defcard-rg map-attribute-descriptions
   [:div
-   [:h3 "Map attributes"]
-   [:table.table
+   [:h3 {:class "text-xl font-bold mb-2"} "Map attributes"]
+   [:table {:class "w-full border-collapse border border-gray-300"}
     [:thead
-     [:tr
-      [:th.col-sm-2 "Key"]
-      [:th.col-sm-3 "Description"]
-      [:th.col-sm-5 "Spec"]]]
+     [:tr {:class "bg-gray-100"}
+      [:th {:class "w-1/5 p-2 text-left border border-gray-300"} "Key"]
+      [:th {:class "w-1/3 p-2 text-left border border-gray-300"} "Description"]
+      [:th {:class "w-1/2 p-2 text-left border border-gray-300"} "Spec"]]]
     (let [ks [:game.map/description
               :game.map/terrains]]
       (into [:tbody]
             (for [k ks]
-              [:tr
-               [:td.col-sm-2 (name k)]
-               [:td.col-sm-3 (doc/key-descriptions k)]
-               [:td.col-sm-5 (pr-str (s/describe k))]])))]
-   [:h3 "Terrain attributes"]
-   [:table.table
+              [:tr {:class "hover:bg-gray-50"}
+               [:td {:class "w-1/5 p-2 border border-gray-300"} (name k)]
+               [:td {:class "w-1/3 p-2 border border-gray-300"} (doc/key-descriptions k)]
+               [:td {:class "w-1/2 p-2 border border-gray-300"} (pr-str (s/describe k))]])))]
+   [:h3 {:class "text-xl font-bold mt-4 mb-2"} "Terrain attributes"]
+   [:table {:class "w-full border-collapse border border-gray-300"}
     [:thead
-     [:tr
-      [:th.col-sm-2 "Key"]
-      [:th.col-sm-3 "Description"]
-      [:th.col-sm-5 "Spec"]]]
+     [:tr {:class "bg-gray-100"}
+      [:th {:class "w-1/5 p-2 text-left border border-gray-300"} "Key"]
+      [:th {:class "w-1/3 p-2 text-left border border-gray-300"} "Description"]
+      [:th {:class "w-1/2 p-2 text-left border border-gray-300"} "Spec"]]]
     (let [ks [:game.map.terrain/q
               :game.map.terrain/r
               :game.map.terrain/terrain-type]]
       (into [:tbody]
             (for [k ks]
-              [:tr
-               [:td.col-sm-2 (name k)]
-               [:td.col-sm-3 (doc/key-descriptions k)]
-               [:td.col-sm-5 (pr-str (s/describe k))]])))]])
+              [:tr {:class "hover:bg-gray-50"}
+               [:td {:class "w-1/5 p-2 border border-gray-300"} (name k)]
+               [:td {:class "w-1/3 p-2 border border-gray-300"} (doc/key-descriptions k)]
+               [:td {:class "w-1/2 p-2 border border-gray-300"} (pr-str (s/describe k))]])))]])
 
 (defcard-rg map-and-scenario-example
   (let [system (ig/init system/game-config)
